@@ -21,7 +21,31 @@ const initApp = () => {
 
 const refreshPage = () => {
     clearListDisplay();
-    // render list
+    renderList();
     // clearItemEntry();
     //setFocusOnEntry();
+}
+
+const clearListDisplay = () => {
+    const parentElement = document.getElementById("listItems");
+    deleteContents(parentElement);
+}
+
+const deleteContents = (parentElement) => {
+    let child = parentElement.lastElementChild;
+    while (child) {
+        parentElement.removeChild(child);
+        child = parentElement.lastElementChild;
+    }
+}
+
+const renderList = () => {
+    const list = toDoList.getlist();
+    list.forEachg((item) => {
+        buildListItem(item);
+    })
+}
+
+const buildListItem = (item) => {
+    const div = 
 }
