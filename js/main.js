@@ -1,5 +1,5 @@
-import ToDoList from "./todolist";
-import toDoItem from "./toDoItem";
+import ToDoList from "./todolist.js";
+import ToDoItem from "./toDoItem.js";
 
 
 const toDoList = new ToDoList
@@ -13,10 +13,37 @@ document.addEventListener("readystatechange", (event) => {
 
 const initApp = () => {
     // Add event listeners
+    const itemEntryForm = document.getElementById("itemEntryForm");
+    itemEntryForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        submission();
+    })
 
+    const clearItems = document.getElementById("clearItems");
+    clearItems.addEventListener("click", (event) => {
+        const list  = toDoList.getlist();
+        if (list.length) {
+            const confirmed = confirm("Are you sure you want to clear the list?"); 
+            if (confirmed) {
+                toDoList.clearlist();
+                updatePersistentData(toDoList.getlist());
+                refreshPage();
+            }       
+        }
+    })
     // Procedural 
-    // Load list obj
+    loadListObj();
     refreshPage();
+}
+
+const loadListObj = () => {
+    const storedList = localStorage.getItem("myToDoList");
+    if (typeof storedList !== "string") return;
+    const parsedList = JSON.parse(storedList);
+    parsedList.forEach(itemObj => {
+        const newToDoItem = createNewItem(itemObj._id, itemObj._item);
+        toDoList.addItemToList(newToDoItem);
+    })
 }
 
 const refreshPage = () => {
@@ -41,7 +68,7 @@ const deleteContents = (parentElement) => {
 
 const renderList = () => {
     const list = toDoList.getlist();
-    list.forEachg((item) => {
+    list.forEach((item) => {
         buildListItem(item);
     })
 }
@@ -60,17 +87,21 @@ const buildListItem = (item) => {
     div.appendChild(check);
     div.appendChild(label);
     const container = document.getElementById("listItems");
-    container.appendChild("div");
+    container.appendChild(div);
 }
 
 const clickListenerToCheckbox = (checkbox) => {
     checkbox.addEventListener("click", (event) => {
-        toDoList.removeItemFromList(checkbox.id);
-        // TODO: remove from persistent data
+        toDoList.removeItem(checkbox.id);
+        updatePersistentData(toDoList.getlist());
         setTimeout(() => {
             refreshPage();
         }, 1000)
     })
+}
+
+const updatePersistentData = (listArray) => {
+    localStorage.setItem("myToDoList", JSON.stringify(listArray))
 }
 
 const clearItemEntry = () => {
@@ -79,4 +110,34 @@ const clearItemEntry = () => {
 
 const setFocusOnEntry = () => {
     document.getElementById("newItem").focus();
+}
+
+const submission = () => {
+    const newEntryText = getNewEntry();
+    if (!newEntryText.length) return;
+    const nextItemId = calcNextItemId();
+    const ToDoItem = createNewItem(nextItemId, newEntryText);
+    toDoList.addItemToList(ToDoItem);
+    updatePersistentData(toDoList.getlist());
+    refreshPage();
+}
+
+const getNewEntry = () => {
+    return document.getElementById("newItem").value.trim();
+}
+
+const calcNextItemId = () => {
+    let nextItemId = 1;
+    const list = toDoList.getlist();
+    if (list.length > 0) {
+        nextItemId = list[list.length - 1].getId() + 1;
+    }
+    return nextItemId;
+}
+
+const createNewItem = (itemID, itemText) => {
+    const toDo = new ToDoItem();
+    toDo.setId(itemID);
+    toDo.setItem(itemText);
+    return toDo;
 }
