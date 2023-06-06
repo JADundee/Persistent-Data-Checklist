@@ -53,4 +53,22 @@ const buildListItem = (item) => {
     check.type = "checkbox";
     check.id = item.getId();
     check.tabIndex = 0;
+    clickListenerToCheckbox(check);
+    const label = document.createElement("label");
+    label.htmlFor = item.getId();
+    label.textContent = item.getItem();
+    div.appendChild(check);
+    div.appendChild(label);
+    const container = document.getElementById("listItems");
+    container.appendChild("div");
+}
+
+const clickListenerToCheckbox = (checkbox) => {
+    checkbox.addEventListener("click", (event) => {
+        toDoList.removeItemFromList(checkbox.id);
+        // TODO: remove from persistent data
+        setTimeout(() => {
+            refreshPage();
+        }, 1000)
+    })
 }
