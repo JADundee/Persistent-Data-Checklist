@@ -22,8 +22,8 @@ const initApp = () => {
 const refreshPage = () => {
     clearListDisplay();
     renderList();
-    // clearItemEntry();
-    //setFocusOnEntry();
+    clearItemEntry();
+    setFocusOnEntry();
 }
 
 const clearListDisplay = () => {
@@ -71,4 +71,12 @@ const clickListenerToCheckbox = (checkbox) => {
             refreshPage();
         }, 1000)
     })
+}
+
+const clearItemEntry = () => {
+    document.getElementById("newItem").value = "";
+}
+
+const setFocusOnEntry = () => {
+    document.getElementById("newItem").focus();
 }
